@@ -1,0 +1,14 @@
+- name: Show BGP summary
+  junipernetworks.junos.junos_command:
+    commands: ['show bgp summary']
+  register: bgp_output
+- name: Show OSPF
+  junipernetworks.junos.junos_command:
+    commands: ['show ospf neighbor']
+  register: ospf_output
+- name: Debug BGP summary
+  debug:
+    msg: "{{ bgp_output.stdout[0] }}"
+- name: Debug OSPF neighbors
+  debug:
+    msg: "{{ ospf_output.stdout[0] }}" 
