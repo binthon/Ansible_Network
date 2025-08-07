@@ -1,0 +1,6 @@
+- name: Push interface descriptions to Junos
+  junipernetworks.junos.junos_config:
+    src: interfaces_description.j2
+    src_format: text
+    update: merge
+    comment: "Ansible interface description update"

@@ -1,0 +1,5 @@
+- name: Run show commandso on Junos devices
+  hosts: vjunos
+  gather_facts: no
+  roles:
+    - show_configurations
