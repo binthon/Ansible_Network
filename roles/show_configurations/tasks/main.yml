@@ -1,0 +1,35 @@
+- name: Show version
+  junipernetworks.junos.junos_command:
+    commands: ['show version']
+  register: version_output
+
+- name: Show interface status
+  junipernetworks.junos.junos_command:
+    commands: ['show interfaces terse']
+  register: interfaces_output
+
+- name: Show VLANs
+  junipernetworks.junos.junos_command:
+    commands: ['show vlans']
+  register: vlans_output
+
+- name: Show routing table
+  junipernetworks.junos.junos_command:
+    commands: ['show route']
+  register: route_output
+
+- name: Debug version
+  debug:
+    msg: "{{ version_output.stdout[0] }}"
+
+- name: Debug interfaces
+  debug:
+    msg: "{{ interfaces_output.stdout[0] }}"
+
+- name: Debug vlans
+  debug:
+    msg: "{{ vlans_output.stdout[0] }}"
+
+- name: Debug routing table
+  debug:
+    msg: "{{ route_output.stdout[0] }}"

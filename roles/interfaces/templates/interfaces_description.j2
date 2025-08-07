@@ -1,0 +1,7 @@
+interfaces {
+{% for intf in interfaces %}
+    {{ intf.name }} {
+        description "{{ intf.description }}";
+    }
+{% endfor %}
+}
