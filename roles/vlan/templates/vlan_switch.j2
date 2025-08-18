@@ -1,0 +1,19 @@
+vlans {
+    {{ vjunos_vlan_name }} {
+        vlan-id {{ vjunos_vlan_id }};
+    }
+}
+interfaces {
+{% for port in vjunos_switch_router_ports %}
+    {{ port }} {
+        unit 0 {
+            family ethernet-switching {
+                interface-mode trunk;
+                vlan {
+                    members {{ vjunos_vlan_name }};
+                }
+            }
+        }
+    }
+{% endfor %}
+}

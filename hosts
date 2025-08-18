@@ -1,7 +1,13 @@
-[vjunos]
+[routers]
 router1 ansible_host=10.250.249.175
 router2 ansible_host=10.250.249.176
+
+[switches]
 switch1 ansible_host=10.250.249.177
+
+[vjunos:children]
+routers
+switches
 
 [vjunos:vars]
 ansible_user=root

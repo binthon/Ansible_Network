@@ -1,5 +1,1 @@
-interfaces:
-  - name: ge-0/0/3
-    description: gNMI interface
-  - name: fxp0
-    description: SSH management interface
+vjunos_vlan_ip: "172.16.10.2/24"

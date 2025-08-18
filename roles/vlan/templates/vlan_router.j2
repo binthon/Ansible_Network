@@ -1,0 +1,10 @@
+interfaces {
+    {{ vjunos_parent_iface }} {
+        unit {{ vjunos_unit }} {
+            vlan-id {{ vjunos_vlan_id }};
+            family inet {
+                address {{ vjunos_vlan_ip }};
+            }
+        }
+    }
+}
