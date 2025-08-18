@@ -1,0 +1,39 @@
+
+- name: "HARD cleanup {{ vjunos_parent_iface }}"
+  when: device_role == "router"
+  junipernetworks.junos.junos_config:
+    lines:
+      - "delete interfaces {{ vjunos_parent_iface }}"
+    comment: "hard cleanup before vlan tagging"
+    confirm_commit: true
+  tags: [router, vlan, cleanup]
+
+- name: "Enable flexible VLAN tagging on {{ vjunos_parent_iface }}"
+  when: device_role == "router"
+  junipernetworks.junos.junos_config:
+    lines:
+      - "set interfaces {{ vjunos_parent_iface }} flexible-vlan-tagging"
+      - "set interfaces {{ vjunos_parent_iface }} encapsulation flexible-ethernet-services"
+    comment: "enable vlan tagging"
+    confirm_commit: true
+  tags: [router, vlan, step1]
+
+- name: "RTR | Router VLAN Configuration (unit {{ vjunos_unit }})"
+  when: device_role == "router"
+  junipernetworks.junos.junos_config:
+    src: vlan_router.j2
+    src_format: text
+    update: merge               
+    comment: "add subif .{{ vjunos_unit }} (vlan-id {{ vjunos_vlan_id }})"
+    confirm_commit: true
+  tags: [router, vlan, step2]
+
+- name: "SW | Switch VLAN Configuration"
+  when: device_role == "switch"
+  junipernetworks.junos.junos_config:
+    src: vlan_switch.j2
+    src_format: text
+    update: merge               
+    comment: "Ansible VLAN configuration switch"
+    confirm_commit: true
+  tags: [switch, vlan]

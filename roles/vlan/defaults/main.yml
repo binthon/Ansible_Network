@@ -1,0 +1,9 @@
+### default variables for vlan_config role
+vjunos_vlan_id: 5
+vjunos_vlan_name: "VLAN5"
+vjunos_unit: 5
+vjunos_parent_iface: "ge-0/0/2"
+vjunos_vlan_ip: ""
+vjunos_switch_router_ports:
+  - "ge-0/0/2"
+vj_confirm_minutes: 0
