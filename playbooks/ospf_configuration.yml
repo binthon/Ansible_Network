@@ -1,0 +1,5 @@
+- name: vJunos OSPF Configuration
+  hosts: vjunos
+  gather_facts: no
+  roles:
+    - ospf
