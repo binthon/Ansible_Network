@@ -1,0 +1,9 @@
+- name: OSPF Configuration
+  when: device_role == "router"
+  junipernetworks.junos.junos_config:
+    src: ospf.j2
+    src_format: text
+    update: merge
+    comment: "OSPF configuration for routers"
+    confirm_commit: true
+  tags: [router, ospf]

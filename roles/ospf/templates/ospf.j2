@@ -1,0 +1,40 @@
+routing-options {
+    router-id {{ ospf_router_id }};
+}
+protocols {
+    ospf {
+        reference-bandwidth {{ ospf_reference_bw }};
+        {% if ospf_areas is defined %}
+          {% set passive_map = ospf_passive_map | default({ (ospf_passive_area | default('0.0.0.0')): ospf_passive_ifaces | default([]) }) %}
+          {% for area, a in ospf_areas.items() %}
+        area {{ area }} {
+            {% for ifp in (passive_map.get(area) or []) %}
+            interface {{ ifp }} { passive; }
+            {% endfor %}
+            {% for iface in a.interfaces | default([]) %}
+            interface {{ iface.name }} {
+                {% if iface.metric is defined %} metric {{ iface.metric }}; {% endif %}
+                {% if iface.hello_interval is defined %} hello-interval {{ iface.hello_interval }}; {% endif %}
+                {% if iface.dead_interval is defined %} dead-interval {{ iface.dead_interval }}; {% endif %}
+                {% if iface.priority is defined %} priority {{ iface.priority }}; {% endif %}
+            }
+            {% endfor %}
+        }
+          {% endfor %}
+        {% else %}
+        area {{ ospf_area }} {
+            {% for ifp in ospf_passive_ifaces | default([]) %}
+            interface {{ ifp }} { passive; }
+            {% endfor %}
+            {% for iface in ospf_interfaces | default([]) %}
+            interface {{ iface.name }} {
+                {% if iface.metric is defined %} metric {{ iface.metric }}; {% endif %}
+                {% if iface.hello_interval is defined %} hello-interval {{ iface.hello_interval }}; {% endif %}
+                {% if iface.dead_interval is defined %} dead-interval {{ iface.dead_interval }}; {% endif %}
+                {% if iface.priority is defined %} priority {{ iface.priority }}; {% endif %}
+            }
+            {% endfor %}
+        }
+        {% endif %}
+    }
+}
