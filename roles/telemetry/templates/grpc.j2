@@ -1,0 +1,18 @@
+system {
+  services {
+    extension-service {
+      request-response {
+        grpc {
+          ssl {
+            port {{ grpc_port | default(32767) }};
+            local-certificate {{ grpc_cert_id }};
+            use-pki;
+            hot-reloading;
+            {% if (grpc_cert_ip | default('')) | length %}ip-address {{ grpc_cert_ip }};{% endif %}
+          }
+          max-connections {{ grpc_max_connections | default(10) }};
+        }
+      }
+    }
+  }
+}

@@ -1,1 +1,12 @@
 device_role: switch
+grpc_enable: true
+grpc_port: 32767
+grpc_cert_id: "grpc-server"
+grpc_cert_type: "rsa"        
+grpc_cert_size: 2048
+grpc_cert_digest: "sha-256"
+grpc_cert_domain: "switch.local"
+grpc_cert_subject: "CN=switch.local,OU=Net,O=Lab,L=Poznan,ST=Wielkopolskie,C=PL"
+grpc_generate_certificate: true
+grpc_cert_ip: ""
+grpc_cert_ipv6: ""
