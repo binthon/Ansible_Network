@@ -1,15 +1,70 @@
-# key-pair & self-signed certificate for gRPC
+# sprawdzenie certyfikatów 
+- name: Sprawdzenie czy certyfikat gRPC już istnieje
+  junipernetworks.junos.junos_command:
+    commands: ['show security pki local-certificate certificate-id {{ grpc_cert_id }}']
+  register: check_grpc_cert
+  failed_when: false
+  changed_when: false
+
+# zmienna faktu określająca czy certyfikat istnieje
+- name: Certyfikat gRPC już istnieje
+  set_fact:
+    grpc_cert_present: "{{ 'Certificate not found' not in check_grpc_cert.stdout[0] }}"
+  failed_when: false
+  changed_when: false
+# wyświetlenie statusu certyfikatu
+- name: Wyświetlenie statusu certyfikatu gRPC
+  debug:
+    msg: "Cert {{ grpc_cert_id }} → {{ 'JEST' if grpc_cert_present else 'BRAK' }}"
+  failed_when: false
+  changed_when: false
+
+# key-pair 
 - name: Generowanie nowej pary kluczy dla gRPC 
+  when:  not grpc_cert_present
   junipernetworks.junos.junos_command:
     commands: ['request security pki generate-key-pair certificate-id {{ grpc_cert_id }} size {{ grpc_cert_size}} type {{ grpc_cert_type}}']
   register: grpc_keypair
+
+# self-signed certificate for gRPC
 - name: Generowanie nowego certyfikatu dla gRPC
+  when:  not grpc_cert_present
   junipernetworks.junos.junos_command:
     commands: ['request security pki local-certificate generate-self-signed certificate-id {{ grpc_cert_id }} domain-name {{ grpc_cert_domain }} subject {{ grpc_cert_subject }} digest {{ grpc_cert_digest }} {%- if grpc_cert_ip|length %} ip-address {{ grpc_cert_ip }}{%- endif %} {%- if grpc_cert_ipv6|length %} ipv6-address {{ grpc_cert_ipv6}}{%- endif %}']
   register: gen_selfsigned_cert
 
+# sprawdzenie czy gRPC jest już skonfigurowany 
+- name: Sprawdzenie czy gRPC jest już skonfigurowany
+  junipernetworks.junos.junos_command:
+    commands:
+      - 'show configuration system services extension-service request-response grpc'
+  register: check_grpc
+  failed_when: false
+  changed_when: false
+
+# zmienna faktu określająca czy gRPC jest już skonfigurowany
+- name: gRPC już jest skonfigurowany
+  set_fact:
+    grpc_present: >-
+      {{
+        (
+          (check_grpc | default({})).get('stdout', []) | join('\n')
+        ) | trim | length > 0
+      }}
+  failed_when: false
+  changed_when: false
+
+
+# wyświetlenie statusu gRPC
+- name: Wyświetlenie statusu gRPC
+  debug:
+    msg: "gRPC - {{ 'JEST' if grpc_present else 'BRAK' }}"
+  failed_when: false
+  changed_when: false
+
 # gRPC CONFIG
 - name: Konfiguracja gRPC
+  when: grpc_cert_present | default(false) and not grpc_present | default(false)
   junipernetworks.junos.junos_config:
     src: grpc.j2
     src_format: text
