@@ -1,1 +1,5 @@
-
+grpc_cert_id: "grpc"
+grpc_enable: true
+grpc_cert_type: "rsa"      
+grpc_cert_size: 2048
+grpc_generate_certificate: true

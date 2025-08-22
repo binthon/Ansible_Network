@@ -1,0 +1,19 @@
+# key-pair & self-signed certificate for gRPC
+- name: Generowanie nowej pary kluczy dla gRPC 
+  junipernetworks.junos.junos_command:
+    commands: ['request security pki generate-key-pair certificate-id {{ grpc_cert_id }} size {{ grpc_cert_size}} type {{ grpc_cert_type}}']
+  register: grpc_keypair
+- name: Generowanie nowego certyfikatu dla gRPC
+  junipernetworks.junos.junos_command:
+    commands: ['request security pki local-certificate generate-self-signed certificate-id {{ grpc_cert_id }} domain-name {{ grpc_cert_domain }} subject {{ grpc_cert_subject }} digest {{ grpc_cert_digest }} {%- if grpc_cert_ip|length %} ip-address {{ grpc_cert_ip }}{%- endif %} {%- if grpc_cert_ipv6|length %} ipv6-address {{ grpc_cert_ipv6}}{%- endif %}']
+  register: gen_selfsigned_cert
+
+# gRPC CONFIG
+- name: Konfiguracja gRPC
+  junipernetworks.junos.junos_config:
+    src: grpc.j2
+    src_format: text
+    update: merge
+    comment: "gRPC configuration for Juniper devices"
+    confirm_commit: true
+  tags: ['router, switch, grpc, telemetry']

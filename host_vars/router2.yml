@@ -10,9 +10,19 @@ ospf_passive_ifaces:
 ospf_areas:
   "0.0.0.0":
     interfaces:
-      - { name: ge-0/0/2.5, metric: 5 }  # łącze do R1
+      - { name: ge-0/0/2.5, metric: 5 }  
   "0.0.0.1":
     interfaces:
       - { name: ge-0/0/1.10 }
       - { name: ge-0/0/1.20 }
       - { name: ge-0/0/1.30 }
+
+grpc_cert_id: "grpc-server"
+grpc_enable: true
+grpc_port: 55000
+grpc_cert_type: "rsa"      
+grpc_cert_size: 2048
+grpc_cert_domain: "router.local"
+grpc_cert_subject: "CN=router.local,OU=Net,O=Lab,L=Poznan,ST=Wielkopolskie,C=PL"
+grpc_generate_certificate: true
+
