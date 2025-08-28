@@ -5,7 +5,6 @@
     lines:
       - "delete interfaces {{ vjunos_parent_iface }}"
     comment: "hard cleanup before vlan tagging"
-    confirm_commit: true
   tags: [router, vlan, cleanup]
 
 - name: "Enable flexible VLAN tagging on {{ vjunos_parent_iface }}"

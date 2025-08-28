@@ -1,0 +1,3 @@
+interfaces:
+  - { name: "Ethernet1", description: "connect1" }
+  - { name: "Ethernet2", description: "connect2" }

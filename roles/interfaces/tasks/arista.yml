@@ -1,0 +1,4 @@
+- name: Configure interface descriptions for Arista devices
+  arista.eos.eos_config:
+    src: arista_interfaces_description.j2
+    save_when: changed

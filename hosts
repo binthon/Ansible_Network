@@ -1,16 +1,43 @@
 [routers]
 router1 ansible_host=10.250.249.175
 router2 ansible_host=10.250.249.176
+arista1 ansible_host=10.250.249.180
+arista2 ansible_host=10.250.249.181
 
 [switches]
 switch1 ansible_host=10.250.249.177
 
-[vjunos:children]
-routers
-switches
+[juniper:children]
+juniper_routers
+juniper_switches
 
-[vjunos:vars]
+[arista:children]
+arista_routers
+arista_switches
+
+[juniper_routers]
+router1
+router2
+
+[juniper_switches]
+switch1
+
+[arista_routers]
+arista1
+arista2
+
+[arista_switches]
+
+[juniper:vars]
 ansible_user=root
-ansible_ssh_private_key_file=~/.ssh/id_rsa
 ansible_connection=netconf
 ansible_network_os=junipernetworks.junos.junos
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+
+[arista:vars]
+ansible_user=admin
+ansible_connection=network_cli
+ansible_network_os=arista.eos.eos
+ansible_ssh_private_key_file=~/.ssh/id_ed25519
+ansible_become=yes
+ansible_become_method=enable
