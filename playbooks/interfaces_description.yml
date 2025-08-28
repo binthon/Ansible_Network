@@ -1,5 +1,5 @@
-- name: Configure interface descriptions on Junos devices
-  hosts: vjunos
+- name: Configure interface descriptions on Junos & Arista
+  hosts: juniper:arista
   gather_facts: no
   roles:
     - interfaces

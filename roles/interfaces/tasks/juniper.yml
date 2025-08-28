@@ -1,0 +1,6 @@
+- name: Junos | Push interface descriptions from template
+  junipernetworks.junos.junos_config:
+    src: junos_interfaces_description.j2
+    src_format: text
+    update: merge
+    comment: "Interface descriptions"

@@ -1,5 +1,5 @@
-- name: vJunos OSPF Configuration
-  hosts: vjunos
+- name: Junos OSPF Configuration
+  hosts: juniper
   gather_facts: no
   roles:
     - ospf

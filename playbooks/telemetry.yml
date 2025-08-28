@@ -1,5 +1,5 @@
-- name: vJunos Telemetry Configuration
-  hosts: vjunos
+- name: Junos Telemetry Configuration
+  hosts: juniper
   gather_facts: no
   roles:
     - telemetry
