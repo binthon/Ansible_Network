@@ -1,0 +1,5 @@
+- name: "Deploy LACP"
+  hosts: switch1,arista1
+  gather_facts: false
+  roles:
+    - lacp

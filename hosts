@@ -1,6 +1,8 @@
 [routers]
 router1 ansible_host=10.250.249.175
 router2 ansible_host=10.250.249.176
+router3 ansible_host=10.250.249.178
+router4 ansible_host=10.250.249.179
 arista1 ansible_host=10.250.249.180
 arista2 ansible_host=10.250.249.181
 
@@ -18,6 +20,8 @@ arista_switches
 [juniper_routers]
 router1
 router2
+router3
+router4
 
 [juniper_switches]
 switch1
@@ -33,6 +37,7 @@ ansible_user=root
 ansible_connection=netconf
 ansible_network_os=junipernetworks.junos.junos
 ansible_ssh_private_key_file=~/.ssh/id_ed25519
+ansible_port=830
 
 [arista:vars]
 ansible_user=admin

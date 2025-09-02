@@ -1,0 +1,31 @@
+- name: Configuration Juniper LACP
+  junipernetworks.junos.junos_config:
+    src: junos_lacp.j2 
+    src_format: text        
+    update: merge            
+    comment: "LACP configuration"
+  register: lacp_config
+  tags: [lacp, juniper]
+
+- name: Confirm Junos commit
+  when: lacp_config is defined and lacp_config.changed
+  junipernetworks.junos.junos_config:
+    confirm_commit: true
+    comment: "Confirm LACP commit"
+  tags: [confirm, juniper]
+
+- name: Validate Junos state (show)
+  junipernetworks.junos.junos_command:
+    commands:
+      - "show lacp interfaces"
+      - "show interfaces terse | match ae"
+      - "show ospf neighbor"
+  register: junos_show
+  changed_when: false
+  tags: [validate, juniper]
+
+- name: Print Junos validation
+  when: junos_show is defined
+  debug:
+    var: junos_show.stdout_lines
+  tags: [validate, juniper]

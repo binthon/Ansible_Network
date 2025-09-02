@@ -1,0 +1,39 @@
+interfaces {
+{% for lacp_settings in lacp | default([]) %}
+  {{ lacp_settings.name }} {
+    description "{{ lacp_settings.description | default('LACP Interface') }}";
+    aggregated-ether-options {
+      lacp {{ lacp_mode | default('active') }};
+    }
+    unit 0 {
+      family inet {
+        address {{ lacp_settings.layer3.ip }};
+      }
+    }
+  }
+  {% for m in lacp_settings.members %}
+  {{ m }} {
+    ether-options {
+      802.3ad {{ lacp_settings.name }};
+    }
+  }
+  {% endfor %}
+{% endfor %}
+}
+
+protocols {
+  ospf {
+  {% for lacp_settings in lacp | default([]) if lacp_settings.layer3 is defined and lacp_settings.layer3.ospf_area is defined %}
+    area {{ lacp_settings.layer3.ospf_area }} {
+      interface {{ lacp_settings.name }}.0;
+    }
+  {% endfor %}
+  {% if loopback is defined and loopback.ip is defined and loopback.ospf_area is defined %}
+    area {{ loopback.ospf_area }} {
+      interface lo0.0 {
+        passive;
+      }
+    }
+  {% endif %}
+  }
+}

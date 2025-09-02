@@ -1,0 +1,24 @@
+
+{% for lacp_settings in lacp | default([]) %}
+{% for m in lacp_settings.members %}
+interface {{ m }}
+   description {{ lacp_settings.description | default('LACP member') }}
+   channel-group {{ lacp_settings.channel_group }} mode {{ lacp_mode | default('active') }}
+{% endfor %}
+
+
+interface {{ lacp_settings.name }}
+   description {{ lacp_settings.description | default('LACP Interface') }}
+   no switchport
+{% if lacp_settings.layer3 is defined and lacp_settings.layer3.ip is defined %}
+   ip address {{ lacp_settings.layer3.ip }}
+{% endif %}
+{% endfor %}
+
+router ospf 1
+{% for lacp_settings in lacp | default([]) %}
+{% if lacp_settings.layer3 is defined and lacp_settings.layer3.network is defined and lacp_settings.layer3.ospf_area is defined %}
+   network {{ lacp_settings.layer3.network }} area {{ lacp_settings.layer3.ospf_area }}
+{% endif %}
+{% endfor %}
+

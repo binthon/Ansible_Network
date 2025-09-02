@@ -1,0 +1,11 @@
+lacp:
+  - name: "Port-Channel1"
+    members:
+      - "Ethernet1"
+      - "Ethernet4"
+    description: "LACP Link Aggregation to switch1 ae1"
+    channel_group: 1
+    layer3:
+      ip: "10.0.1.2/30"
+      network: "10.0.1.0/30"
+      ospf_area: "0.0.0.0"

@@ -3,3 +3,16 @@ grpc_enable: true
 grpc_cert_type: "rsa"      
 grpc_cert_size: 2048
 grpc_generate_certificate: true
+
+lacp:
+  - name: "ae1"
+    members:
+      - "ge-0/0/2"
+      - "ge-0/0/3"
+    description: "LACP Link Aggregation to arista-eos1 Port-Channel1"
+    layer3:
+      ip: "10.0.1.1/30"
+      network: "10.0.1.0/30"
+      ospf_area: "0.0.0.0"
+loopback:
+  ospf_area: "0.0.0.0"
