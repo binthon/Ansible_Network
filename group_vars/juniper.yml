@@ -1,7 +1,9 @@
 interfaces:
   - { name: "ge-0/0/0", description: "uplink" }
   - { name: "ge-0/0/1", description: "downlink" }
+
 lacp_mode: "active"
+lacp_ae_device_count: 10
 
 ansible_connect_timeout: 60
 ansible_command_timeout: 300     

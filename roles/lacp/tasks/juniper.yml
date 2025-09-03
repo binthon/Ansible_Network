@@ -1,4 +1,13 @@
+- name: Ensure aggregated Ethernet device-count
+  junipernetworks.junos.junos_config:
+    lines:
+      - set chassis aggregated-devices ethernet device-count {{ lacp_ae_device_count }}
+    comment: "Enable AE device-count"
+  register: agg_dev
+  tags: [lacp, juniper]
+
 - name: Configuration Juniper LACP
+  when: interfaces is defined and lacp_mode is defined and agg_dev is defined
   junipernetworks.junos.junos_config:
     src: junos_lacp.j2 
     src_format: text        
@@ -8,7 +17,7 @@
   tags: [lacp, juniper]
 
 - name: Confirm Junos commit
-  when: lacp_config is defined and lacp_config.changed
+  when: lacp_config is defined and lacp_config.changed and agg_dev is defined and agg_dev.changed
   junipernetworks.junos.junos_config:
     confirm_commit: true
     comment: "Confirm LACP commit"
@@ -17,9 +26,12 @@
 - name: Validate Junos state (show)
   junipernetworks.junos.junos_command:
     commands:
-      - "show lacp interfaces"
+      - "show configuration chassis aggregated-devices"
       - "show interfaces terse | match ae"
+      - "show lacp interfaces"
+      - "show lacp interfaces ae1"
       - "show ospf neighbor"
+      - "show ospf interface ae1.0"
   register: junos_show
   changed_when: false
   tags: [validate, juniper]

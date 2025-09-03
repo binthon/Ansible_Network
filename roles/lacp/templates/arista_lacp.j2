@@ -3,9 +3,9 @@
 {% for m in lacp_settings.members %}
 interface {{ m }}
    description {{ lacp_settings.description | default('LACP member') }}
+   no switchport
    channel-group {{ lacp_settings.channel_group }} mode {{ lacp_mode | default('active') }}
 {% endfor %}
-
 
 interface {{ lacp_settings.name }}
    description {{ lacp_settings.description | default('LACP Interface') }}
