@@ -8,7 +8,6 @@ lacp:
   - name: "ae1"
     members:
       - "ge-0/0/2"
-      - "ge-0/0/3"
     description: "LACP Link Aggregation to arista-eos1 Port-Channel1"
     layer3:
       ip: "10.0.1.1/30"

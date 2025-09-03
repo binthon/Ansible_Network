@@ -2,7 +2,6 @@ lacp:
   - name: "Port-Channel1"
     members:
       - "Ethernet1"
-      - "Ethernet4"
     description: "LACP Link Aggregation to switch1 ae1"
     channel_group: 1
     layer3:

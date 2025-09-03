@@ -1,0 +1,24 @@
+- name: Arista LACP Configuration
+  arista.eos.eos_config:
+    src: arista_lacp.j2
+    save_when: changed
+  register: lacp_config
+  tags: [lacp, arista]
+
+- name: Validate Arista state (show)
+  when: lacp_config is defined
+  arista.eos.eos_command:
+    commands:
+      - "show lacp peer"
+      - "show interfaces status | include connnected"
+      - "show port-channel dense"
+      - "show ip ospf neighbor"
+  register: arista_show
+  changed_when: false
+  tags: [validate, arista]
+
+- name: Print Arista validation
+  when: arista_show is defined
+  debug:
+    var: arista_show.stdout_lines
+  tags: [validate, arista]
