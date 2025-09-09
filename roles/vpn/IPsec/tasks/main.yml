@@ -1,0 +1,88 @@
+- name: Check variables for VPN
+  ansible.builtin.assert:
+    that:
+      - psk is defined
+      - (psk | trim | length) >= 8
+      - wan_interface is defined
+      - wan_ip is defined
+      - wan_peer_ip is defined
+      - st0_ip is defined
+      - st0_peer_ip is defined
+      - local_lan is defined
+      - remote_peer_lan is defined
+    fail_msg: "One or more required variables for VPN are not defined."
+    success_msg: "All required variables for VPN are defined."
+  changed_when: false
+
+- name: Cleanup (gateway/vpn/st0)
+  junipernetworks.junos.junos_config:
+    lines:
+      - "delete security ike gateway {{ ike_gateway_name }}"
+      - "delete security ipsec vpn {{ ipsec_vpn_name }}"
+      - "delete interfaces {{ st_name }} unit {{ st0_unit | default('0') }}"
+    src_format: set
+    update: merge
+    comment: "cleanup base before fresh IPsec load"
+    confirm_commit: true
+  failed_when: false
+
+- name: Cleanup (static routes to remote_peer_lan)
+  when: remote_peer_lan | default([]) | length > 0
+  junipernetworks.junos.junos_config:
+    lines:
+      - "delete routing-options static route {{ item }}"
+    src_format: set
+    update: merge
+    comment: "cleanup routes before fresh IPsec load"
+    confirm_commit: true
+  loop: "{{ remote_peer_lan }}"
+  failed_when: false
+
+- name: Check communication with device
+  junipernetworks.junos.junos_command:
+    commands: 
+      - "ping {{ wan_peer_ip }} count 3"
+  register: ping_result
+  failed_when: ping_result.failed
+  changed_when: false
+
+- name: Configuration VPN
+  when: ping_result is succeeded
+  junipernetworks.junos.junos_config:
+    src: ipsec_junos_config.j2
+    src_format: text
+    update: merge
+    comment: "IPsec VPN configuration for Juniper devices"
+  register: vpn_config
+
+- name: Commit changes
+  when: vpn_config is changed
+  junipernetworks.junos.junos_config:
+    confirm_commit: true
+    comment: "Confirm IPsec deploy after checks"
+  changed_when: true
+
+
+- name: Check VPN configuration
+  when: vpn_config is changed 
+  junipernetworks.junos.junos_command:
+    commands: 
+      - show configuration interfaces {{ st_name }}
+      - show configuration security ike
+      - show configuration security ipsec
+      - show configuration routing-options static route all
+    comment: "Checking VPN configuration"
+  register: vpn_check
+  failed_when: false
+  changed_when: false
+
+- name: Test ping do hosta w zdalnym LAN
+  when:
+    - vpn_config is changed
+    - remote_test_ip is defined
+  junipernetworks.junos.junos_command:
+    commands:
+      - "ping {{ remote_test_ip }} count 3"
+  register: ping_lan
+  failed_when: false
+  changed_when: false

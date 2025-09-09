@@ -10,3 +10,40 @@ grpc_cert_subject: "CN=router.local,OU=Net,O=Lab,L=Poznan,ST=Wielkopolskie,C=PL"
 grpc_generate_certificate: true
 grpc_cert_ip: ""
 grpc_cert_ipv6: ""
+
+# === IPsec VPN ===
+ipsec_auth_method: "psk"               
+psk_file: "../group_vars/juniper_pass.txt"
+psk: "{{ lookup('ansible.builtin.file', psk_file) | trim }}"
+ipsec_route_mode: "static"
+ipsec_ospf_area: "0.0.0.0"
+ipsec_establish_immediately: true
+
+# IKE 
+ike_version: "v2-only"
+ike_proposal_name: "IKE-P1-R1-R2"
+ike_policy_name:   "IKE-POL1-R1-R2"
+ike_encryption: "aes-256-cbc"
+ike_auth_hash: "sha-256"              
+ike_dh_group: "group19"
+ike_lifetime: 43200 
+ike_gateway_name: "GW-R1-R2"
+
+# IPsec 
+ipsec_proposal_name: "IPSEC-P1-R1-R2"
+ipsec_vpn_name:      "VPN-R1-R2"
+ipsec_encryption: "aes-256-gcm"
+ipsec_auth_alg: ""               
+ipsec_pfs_group: "group19"
+ipsec_lifetime: 3600
+
+# DPD / NAT-T
+dpd_enable: true
+dpd_interval: 10
+dpd_threshold: 3
+natt_enable: "automatic"     
+
+
+# Interfejs tunelowy
+st_name: "st0"
+st0_unit: 0
