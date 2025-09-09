@@ -1,0 +1,9 @@
+- name: Deploy route-based IPsec VPN 
+  hosts: router1:router2           
+  gather_facts: no
+  serial: 1                
+  any_errors_fatal: true
+
+  roles:
+    - role: vpn/IPsec      
+      tags: [deploy]

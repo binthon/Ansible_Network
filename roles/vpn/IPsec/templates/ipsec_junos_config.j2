@@ -1,0 +1,88 @@
+interfaces {
+    {{ st_name }} {
+        description "IPsec VPN Tunnel to {{ st0_peer_ip }}";
+        unit {{ st0_unit | default('0') }} {
+            family inet {
+                address {{ st0_ip }};
+            }
+        }
+    }
+}
+
+security {
+    ike {
+         proposal {{ ike_proposal_name }} {
+            encryption-algorithm {{ ike_encryption }};
+            authentication-algorithm {{ ike_auth_hash }};
+            dh-group {{ ike_dh_group }};
+            lifetime-seconds {{ ike_lifetime }};
+            authentication-method pre-shared-keys;
+        }
+        policy {{ wan_peer_ip }} {
+            proposals {{ ike_proposal_name }};
+            pre-shared-key { 
+                ascii-text {{ psk | trim | to_json }};
+            }
+        }
+        gateway {{ ike_gateway_name | default('IKE_GW') }} {
+            ike-policy {{ wan_peer_ip  }};
+            address {{ wan_peer_ip }};
+            external-interface {{ wan_interface }};
+            version {{ ike_version | default('v2-only') }};
+            {% if dpd_enable | default(false) %}
+            dead-peer-detection {
+                interval {{ dpd_interval | default(10) }};
+                threshold {{ dpd_threshold | default(3) }};
+            }
+            {% endif %}
+        }
+    }
+    ipsec {
+        proposal {{ ipsec_proposal_name | default('IPsec_Default') }} {
+            protocol {{ ipsec_protocol | default('esp') }};
+            {% if ipsec_auth_alg %}
+            authentication-algorithm {{ ipsec_auth_alg | default('') }};
+            {% endif %}
+            encryption-algorithm {{ ipsec_encryption_algorithm | default('aes-256-gcm') }};
+            lifetime-seconds {{ ipsec_lifetime | default(3600) }};
+        }
+        policy {{ ipsec_policy_name | default('IPsec_Default') }} {
+            proposals {{ ipsec_proposal_name | default('IPsec_Default') }};
+            {% if ipsec_pfs_group | default('', true) %}
+            perfect-forward-secrecy {
+                keys {{ ipsec_pfs_group | default('group19') }};
+            }
+            {% endif %}
+        }
+        vpn {{ ipsec_vpn_name | default('IPsec_VPN') }} {
+            bind-interface {{ st_name }}.{{ st0_unit | default('0') }};
+            ike {
+                gateway {{ ike_gateway_name | default('IKE_GW') }};
+                ipsec-policy {{ ipsec_policy_name | default('IPsec_Default') }};
+            }
+            {% if ipsec_establish_immediately | default(true) %}
+            establish-tunnels immediately;
+            {% endif %}
+        }
+    }
+}
+
+{% if ipsec_route_mode | default('static') == 'static' %}
+routing-options {
+  static {
+    {% for prefix in remote_peer_lan | default([]) %}
+    route {{ prefix }} {
+      next-hop {{ st0_peer_ip }};
+    }
+    {% endfor %}
+  }
+}
+{% elif ipsec_route_mode == 'ospf' %}
+protocols {
+  ospf {
+    area {{ ipsec_ospf_area }} {
+      interface {{ st_name }}.{{ st0_unit | default('0') }};
+    }
+  }
+}
+{% endif %}
